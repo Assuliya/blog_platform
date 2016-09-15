@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Blog</title>
+</head>
+<body>
+  <h2>Edit User {{user.id}}</h2>
+  {% if messages %}
+    <div class="errors">
+       {% for message in messages %}
+       <h4{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h4>
+       {% endfor %}
+    </div>
+  {% endif %}
+  <form class="edit" action="{% url 'update'%}" method="post">
+    {% csrf_token %}
+    <label for="username">Username</label>
+    <input type="file" name="image">
+    <label for="username">Username</label>
+    <input type="text" name="username" value="{{user.username}}">
+    <input type="submit" value="Submit">
+  </form>
+  <br><br>
+  <form class="edit" action="{% url 'update_pass' %}" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="email" value="{{user.username}}">
+    <label for="old_password">Existing Password:</label>
+    <input type="password" name="old_password">
+    <label for="password">New Password:</label>
+    <input type="password" name="password">
+    <label for="repeat">Repeat the New Password:</label>
+    <input type="password" name="repeat">
+    <input type="submit" value="Submit">
+  </form>
+  <br>
+  <a href="{%url 'show' user_id=user.id%}">Back</a>
+</body>
+</html>

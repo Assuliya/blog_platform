@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>User Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  </head>
+  <body>
+    {% if user.id == request.session.user%}
+      <h3 id="note">Your homepage!</h3>
+    {% endif %}
+    <div id="user_info">
+      <h1>{{user.image.url}}</h1>
+      {% load static %}
+      <img src='{% static "blog/images/user/anonym.jpg"%}' alt="piture">
+      <h3>Username:</h3>
+      <p>{{user.username}}</p>
+      <h3>Created at:</h3>
+      <p>{{user.created_at}}</p>
+      <h3>Updated at:</h3>
+      <p>{{user.updated_at}}</p>
+      {% if not user.id == request.session.user%}
+        <a href="{% url 'show' user_id=request.session.user%}">My page</a>
+      {%endif%}
+      {% if user.id == request.session.user%}
+        <a href="{% url 'logout' %}">Logout</a>
+        <a href="{% url 'deletion_page' %}">Delete</a>
+        <a href="{% url 'edit' user_id=request.session.user%}">Edit</a>
+      {%endif%}
+      <a href="{% url 'dashboard'%}">Dashboard</a>
+    </div>
+    <br>
+    <form action="{% url 'add_post' %}" method='post'>
+      {% csrf_token %}
+      Title: <input type="text" name="title">
+      Add message: <input type="textarea" name="post">
+      <input type="submit" value="Add">
+    </form>
+
+    <div class="output">
+      {%  for post in posts %}
+         <div class="posts">
+             <h3>{{post.message}}</h3>
+             <p>{{post.user_id.username}}</p>
+             <p>{{post.created_at}}</p>
+           <form action="{% url 'add_comment' post_id=post.id%}" method='post'>
+             {% csrf_token %}
+             Add comment: <input type="textarea" name="comment">
+             <input type="submit" value="Add">
+           </form>
+         </div>
+         {% for comment in comments %}
+          {% if comment.post_id.id == message.id%}
+            <div class="comments">
+                 <h3>{{comment.comment}}</h3>
+                 <p>{{comment.user_id.username}}</p>
+                 <p>{{message.created_at}}</p>
+            </div>
+          {% endif %}
+         {% endfor %}
+      {% endfor %}
+    </div>
+  </body>
+</html>
