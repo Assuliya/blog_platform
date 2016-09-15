@@ -58,8 +58,8 @@ class UserManager(models.Manager):
 
 class User(models.Model):
       username = models.CharField(max_length=45)
-      image = models.ImageField(upload_to='blog/images/user/', default='blog/images/post/anonym.png')
-      about = models.TextField(default = "")
+      image = models.ImageField(upload_to='user/', null=True, blank=True)
+      about = models.TextField(null=True, blank=True)
       pw_hash = models.CharField(max_length=255)
       created_at = models.DateTimeField(auto_now_add = True)
       updated_at = models.DateTimeField(auto_now = True)
@@ -76,7 +76,7 @@ class Tag(models.Model):
 class Post(models.Model):
       title = models.CharField(max_length=100)
       post = models.TextField()
-      image = models.ImageField(upload_to='blog/images/post/', default='blog/images/post/no.png')
+      image = models.ImageField(upload_to='post/', null=True, blank=True)
       user_id = models.ForeignKey(User)
       tags = models.ManyToManyField(Tag, related_name='post_tag')
       like = models.PositiveIntegerField(default = 0)

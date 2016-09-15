@@ -11,9 +11,7 @@
       <h3 id="note">Your homepage!</h3>
     {% endif %}
     <div id="user_info">
-      <h1>{{user.image.url}}</h1>
-      {% load static %}
-      <img src='{% static "blog/images/user/anonym.jpg"%}' alt="piture">
+      <img src='{{user.image.url}}' onError="this.onerror=null;this.src='/media/user/anonym.jpg';" alt="piture">
       <h3>Username:</h3>
       <p>{{user.username}}</p>
       <h3>Created at:</h3>
