@@ -10,8 +10,9 @@
     {% if user.id == request.session.user%}
       <h3 id="note">Your homepage!</h3>
     {% endif %}
+    <h1>{{user.image.url}}</h1>
     <div id="user_info">
-      <img src='{{user.image.url}}' onError="this.onerror=null;this.src='/media/user/anonym.jpg';" alt="piture">
+      <img src='{{user.image.url}}' onError="this.onerror=null;this.src='/media/user/anonym.jpg';" alt="piture" height="20%" width="20%">
       <h3>Username:</h3>
       <p>{{user.username}}</p>
       <h3>Created at:</h3>

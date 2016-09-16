@@ -1,6 +1,9 @@
-from django import forms
-
-class ImageForm(forms.Form):
-    imagefile = forms.ImageField(
-        label='Select a file',
-    )
+# from django import forms
+# from models import User
+#
+# class UserForm(forms.ModelForm):
+#     class Meta:
+#         model = User
+#         fields = [
+#         'image',
+#         ]

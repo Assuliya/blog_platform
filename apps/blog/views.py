@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
 from models import User, Post, Comment,Tag
+# from forms import UserForm
 import bcrypt
 
 def index(request):
@@ -69,9 +70,10 @@ def update(request):
             print_messages(request, result[1])
             return redirect(reverse('edit', kwargs={'user_id':request.session['user']}))
     update = User.objects.get(id = request.session['user'])
+    request.FILES['image'].name = request.POST['username']
     update.username = request.POST['username']
-    update.image = request.POST['image']
-    update.save(update_fields=None)
+    update.image = request.FILES['image']
+    update.save()
     return redirect(reverse('show', kwargs={'user_id':request.session['user']}))
 
 def update_pass(request):
