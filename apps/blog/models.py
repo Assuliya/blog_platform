@@ -58,7 +58,7 @@ class UserManager(models.Manager):
 
 class User(models.Model):
       username = models.CharField(max_length=45)
-      image = models.ImageField(upload_to='user/', null=True, blank=True)
+      image = models.ImageField(upload_to='user/', default = 'user/anonym.jpg', null=True, blank=True)
       about = models.TextField(null=True, blank=True)
       pw_hash = models.CharField(max_length=255)
       created_at = models.DateTimeField(auto_now_add = True)

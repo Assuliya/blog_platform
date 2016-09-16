@@ -1,8 +1,12 @@
-.container-fluid {
+body {
+  background-color: #1abc9c !important;
+}
+
+/*.container-fluid {
     padding-top: 20px;
     padding-bottom: 40px;
 
-}
+}*/
 
 .bg-1 {
     background-color: #1abc9c; /* Green */
@@ -28,9 +32,9 @@
 
 }
 
-.left-margin{
+/*.left-margin{
   margin-left: 40px;
-}
+}*/
 @media screen and (max-width: 768px) {
     .thumbnail {
         margin: 0;
@@ -62,4 +66,15 @@ button{
 button:hover{
   background-color: white !important;
   color: #000 !important;
+}
+
+label{
+  color: black !important;
+}
+.modal-header{
+  color: black !important;
+}
+
+a:hover {
+  background-color: #000 !important;
 }

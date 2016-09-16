@@ -15,9 +15,9 @@
   {% endif %}
   <form class="edit" action="{% url 'update'%}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    <label for="username">Username</label>
+    <label for="image">Image: </label>
     <input type="file" name="image">
-    <label for="username">Username</label>
+    <label for="username">Username: </label>
     <input type="text" name="username" value="{{user.username}}">
     <input type="submit" value="Submit">
   </form>

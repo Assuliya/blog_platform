@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
+from django.db.models import Count
 from models import User, Post, Comment,Tag
 # from forms import UserForm
 import bcrypt
@@ -14,23 +15,45 @@ def login(request):
 def register(request):
     return render(request, 'blog/register.html')
 
+def post(request, post_id):
+    post = Post.objects.get(id=post_id)
+    context = {'post':post}
+    return render(request, 'blog/post.html', context)
+
 def show(request, user_id):
-    if not 'user' in request.session:
-        return redirect(reverse('index'))
+    # if not 'user' in request.session:
+    #     return redirect(reverse('index'))
     user = User.manager.get(id=user_id)
     posts = Post.objects.filter(user_id=user_id)
     comments = Comment.objects.all()
     context = {'user':user, 'posts':posts, 'comments': comments}
     return render(request, 'blog/show.html', context)
 
-def edit(request, user_id):
-    user = User.objects.get(id = user_id)
+def edit(request):
+    user = User.objects.get(id = request.session['user'])
     context = {'user':user}
     return render(request, 'blog/edit.html', context)
 
 def dashboard(request):
-    users = User.objects.all()
+    users = User.objects.all().order_by('-username')
     context = {'users':users}
+    latest = Post.objects.all().order_by('-created_at')[:4]
+    liked = Post.objects.all().order_by('-like')[:4]
+
+    num_like = User.objects.all()
+    num_like = []
+    for x in users:
+        z = Post.objects.filter(user_id__id = x.id)
+        like_total = 0
+        for post in z:
+            like_total += post.like
+        pack = {}
+        pack.update({'count':like_total})
+        pack.update({'id':x.id})
+        num_like.append(pack)
+    num_post = Post.objects.all().values('user_id').annotate(count=Count('user_id')).order_by('-count')
+
+    context = {'users':users, 'latest':latest, 'liked':liked, 'num_like':num_like, 'num_post':num_post}
     return render(request, 'blog/dashboard.html', context)
 
 def deletion_page(request):
@@ -69,10 +92,12 @@ def update(request):
         if result[0] == False:
             print_messages(request, result[1])
             return redirect(reverse('edit', kwargs={'user_id':request.session['user']}))
+
     update = User.objects.get(id = request.session['user'])
-    request.FILES['image'].name = request.POST['username']
     update.username = request.POST['username']
-    update.image = request.FILES['image']
+    if 'image' in request.FILES:
+        request.FILES['image'].name = request.POST['username']
+        update.image = request.FILES['image']
     update.save()
     return redirect(reverse('show', kwargs={'user_id':request.session['user']}))
 
@@ -106,7 +131,11 @@ def delete(request):
 def add_post(request):
     if request.method == "POST":
         user = User.objects.get(id=request.session['user'])
-        Post.objects.create(title = request.POST['title'], message = request.POST['message'], user_id = user)
+        if 'image' in request.FILES:
+            request.FILES['image'].name = user.username + "_" + request.POST['title'][:8]
+            Post.objects.create(image = request.FILES['image'], title = request.POST['title'], post = request.POST['post'], user_id = user)
+        else:
+            Post.objects.create(title = request.POST['title'], post = request.POST['post'], user_id = user)
         return redirect(reverse('show', kwargs={'user_id':request.session['user']}))
     else:
 	    return redirect(reverse('show'))

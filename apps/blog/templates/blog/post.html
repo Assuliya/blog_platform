@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Blog</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'blog/css/main.css'%}">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+
+  <div class="container bg-1">
+    <div class="row">
+      <div class="col-sm-9">
+        <div class="row">
+          <div class="thumbnail shadow">
+            <h3>{{post.title}}</h3>
+            <h4><a href="{% url 'show' user_id=post.user_id.id%}">{{post.user_id.username}}</a></h4>
+            {% if post.image.url != None %}
+              <img src='{{post.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
+            {% endif %}
+            <p>{{post.post}}</p>
+            <h4>{{post.created_at}}</h4>
+          </div>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div class="row">
+          <div class="thumbnail">
+            <h3>Navigation</h3>
+            {% if request.session.user %}
+              {% if not user.id == request.session.user%}
+                <a href="{% url 'show' user_id=request.session.user%}">My page</a>
+              {%endif%}
+              {% if user.id == request.session.user%}
+                <a href="{% url 'logout' %}">Logout</a>
+              {%endif%}
+              <a href="{% url 'dashboard'%}">Dashboard</a>
+            {% else %}
+              <a href="{% url 'register'%}">Register</a>
+              <a href="{% url 'login'%}">Login</a>
+            {%endif%}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <footer class="container-fluid bg-2">
+    <div class="row">
+      <div class="col-sm-7">
+        <button class="btn">Prev</button>
+        <button class="btn">Next</button>
+      </div>
+      <div class="col-sm-1">
+        <button href="#" class="btn">Main</button>
+      </div>
+    </div>
+    <br><br>
+    <p>Site by <a href="#">Tetiana Nesterchuk</a></p>
+  </footer>
+
+
+</body>
+</html>
