@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>User Dashboard</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'blog/css/main.css'%}">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </head>
+  <body>
+    <div class="container bg-1">
+      <h1 class="text-center">MY BLOG</h1>
+      <h2 class="text-center">Welcome to the blog of <span class="badge">{{user.username}}</span></h2>
+      {% if user.id == request.session.user%}
+        <h3 class="text-right">Your homepage!</h3>
+      {% endif %}
+      <br><br>
+      <div class="row">
+        <div class="col-sm-8">
+          {% if posts %}
+            {%  for post in posts %}
+               <div class="row">
+                 <div class="thumbnail shadow"><li><a href="{% url 'post' post_id=post.id %}">
+                   {% if post.image.url != None %}
+                    <img src='{{post.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
+                   {% endif %}
+                   <p><strong>{{post.title}}</strong></p>
+                   <p>{{post.post}}</p>
+                   <p>{{post.created_at}}</p>
+                   <div class="row">
+                     <div class="col-sm-9">
+
+                     </div>
+                     <div class="col-sm-3">
+                       <p>Comments: <span class="badge">3</span></p>
+                     </div>
+                   </div>
+                 </a></li></div>
+               </div>
+            {% endfor %}
+          {% else %}
+            <h3>This user hasn't added any posts yet</h3>
+          {% endif %}
+        </div>
+
+        <div class="col-sm-4 ">
+          <div class="row">
+            <div class="thumbnail">
+              <h3>Navigation</h3>
+              <a href="{% url 'main'%}">Main</a>
+              {% if request.session.user %}
+                  {% if not user.id == request.session.user%}
+                    - <a href="{% url 'user' user_id=request.session.user%}">My page</a>
+                  {%endif%}
+                  - <a href="{% url 'logout' %}">Logout</a>
+              {% else %}
+                  - <a href="{% url 'login'%}">Login/Register</a>
+              {%endif%}
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="thumbnail">
+              <img src='{{user.image.url}}' onError="this.onerror=null;this.src='/media/user/anonym.jpg';" class="img-responsive" style="width:100%" alt="piture">
+              <h3>{{user.username}}</h3>
+              <p>About:</p>
+              <p>{{user.about}}</p>
+              <p>Created at: {{user.created_at}}</p>
+              <p>Updated at: {{user.updated_at}}</p>
+              {% if user.id == request.session.user%}
+              <div class="row">
+                <div class="col-sm-8">
+                  <a href="{% url 'edit' %}">Edit</a>
+                </div>
+                <div class="col-sm-2">
+                  <button class="btn-danger" data-toggle="modal" data-target="#delete">Delete</button>
+                </div>
+              </div>
+              {%endif%}
+            </div>
+          </div>
+
+          {% if user.id == request.session.user%}
+          <div class="row">
+            <div class="thumbnail">
+              <h3>Add Post</h3>
+              <button class="btn" data-toggle="modal" data-target="#post">Add Post</button>
+            </div>
+          </div>
+          {% endif %}
+
+
+          <!-- POST Modal -->
+          <div class="modal fade" id="post" role="dialog">
+            <div class="modal-dialog">
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4>Ready for creation?</h4>
+                </div>
+                <div class="modal-body">
+                  <form role="form" action="{% url 'add_post' %}" method='post' enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="form-group">
+                      <label for="title">Enter a title:</label>
+                      <input type="text" name="title" class="form-control" id="title" placeholder="Title">
+                    </div>
+                    <div class="form-group">
+                      <label for="image">Choose an image (optional):</label>
+                      <input type="file" name="image" id="image" placeholder="Select an image">
+                    </div>
+                    <div class="form-group">
+                      <label for="post">Enter a post:</label>
+                      <input type="textarea" name="post" class="form-control" id="post" placeholder="Post">
+                    </div>
+                    <button type="submit" class="btn btn-block">Ready!<span class="glyphicon glyphicon-ok"></span></button>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal">
+                    <span class="glyphicon glyphicon-remove"></span> Cancel
+                  </button>
+                  <p>Need <a href="#">help?</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <!-- DELETE Modal -->
+          <div class="modal fade" id="delete" role="dialog">
+            <div class="modal-dialog">
+              <!-- Modal content-->
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h4>
+                    Are you sure you want to delete your account?
+                    <a href="{% url 'delete' %}">Yes</a>
+                  </h4>
+                </div>
+                <div class="modal-footer">
+                  <button type="submit" class="btn btn-danger btn-default pull-left" data-dismiss="modal">
+                    <span class="glyphicon glyphicon-remove"></span> Cancel
+                  </button>
+                  <p>Need <a href="#">help?</a></p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="thumbnail">
+              <h3>Author's Most Popular Posts</h3>
+              <ul class="">
+                  <li><a href="#">
+                    <div class="row">
+                      <div class="col-sm-5">
+                        <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                      </div>
+                      <div class="col-sm-2">
+                        <p>Mingsum</p><br>
+                      </div>
+                    </div>
+                  </a></li>
+                  <li><a href="#">
+                    <div class="row">
+                      <div class="col-sm-5">
+                        <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                      </div>
+                      <div class="col-sm-2">
+                        <p>Mingsum</p><br>
+                      </div>
+                    </div>
+                  </a></li>
+                  <li><a href="#">
+                    <div class="row">
+                      <div class="col-sm-5">
+                        <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                      </div>
+                      <div class="col-sm-2">
+                        <p>Mingsum</p><br>
+                      </div>
+                    </div>
+                  </a></li>
+                  <li><a href="#">
+                    <div class="row">
+                      <div class="col-sm-5">
+                        <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                      </div>
+                      <div class="col-sm-2">
+                        <p>Mingsum</p><br>
+                      </div>
+                    </div>
+                  </a></li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <footer class="container-fluid bg-2 text-center">
+      <br><br><br>
+      <p>Site by <a href="#">Tetiana Nesterchuk</a></p>
+    </footer>
+
+  </body>
+</html>

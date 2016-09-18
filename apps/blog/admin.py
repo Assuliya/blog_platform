@@ -1,9 +1,7 @@
- # From inside your project's urls.py file
 from django.conf.urls import url, include
 from django.contrib import admin
 
-  # THIS SECTION IS NEW!
-  # ********************
+
 from models import User, Tag, Post, Comment
 
 class UserAdmin(admin.ModelAdmin):

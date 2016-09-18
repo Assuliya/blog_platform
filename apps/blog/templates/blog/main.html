@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Blog</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'blog/css/main.css'%}">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+<body>
+  <div class="container bg-1">
+    <h1 class="text-center">MY BLOG</h1>
+    <h2 class="text-center">Main Page</h2>
+    <br><br>
+    <div class="row">
+      <div class="col-sm-7">
+        <div class="row">
+          <div class="thumbnail shadow">
+            <h2>Latest:</h2>
+            {%  for post in latest %}
+              <li><a href="{% url 'post' post_id=post.id %}"><div class="row">
+                <div class="col-sm-3">
+                  {% if post.image.url != None %}
+                    <img src='{{post.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
+                  {% else %}
+                    <img src='/media/post/no.png' class="img-responsive" style="width:100%" alt="post_picture">
+                  {% endif %}
+                  <p>{{post.user_id.username}}</p>
+                </div>
+                <div class="col-sm-3">
+                  <p>{{post.title}}</p>
+                  <p>{{post.created_at}}</p>
+                </div>
+                <div class="col-sm-6">
+                  <p>{{post.post}}</p>
+                </div>
+              </div></a></li>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="row">
+          <div class="thumbnail shadow">
+            <h2>Most Liked:</h2>
+            <ul class="">
+            {%  for post in liked %}
+              <li><a href="{% url 'post' post_id=post.id %}"><div class="row">
+                <div class="col-sm-3">
+                  {% if post.image.url != None %}
+                    <img src='{{post.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
+                  {% else %}
+                    <img src='/media/post/no.png' class="img-responsive" style="width:100%" alt="post_picture">
+                  {% endif %}
+                  <p>{{post.user_id.username}}</p>
+                </div>
+                <div class="col-sm-3">
+                  <p>{{post.title}}</p>
+                  <p>{{post.created_at}}</p>
+                </div>
+                <div class="col-sm-6">
+                  <p>{{post.post}}</p>
+                </div>
+              </div></a></li>
+            {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="col-sm-4 left-margin">
+        <div class="row">
+          <div class="thumbnail">
+            <h3>Navigation</h3>
+            <a href="{% url 'main'%}">Main</a>
+            {% if request.session.user %}
+                {% if not user.id == request.session.user%}
+                  - <a href="{% url 'user' user_id=request.session.user%}">My page</a>
+                {%endif%}
+                - <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                - <a href="{% url 'login'%}">Login/Register</a>
+            {%endif%}
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="thumbnail">
+            <h2>Users:</h2>
+            <table>
+               <thead>
+                  <tr>
+                    <th>Id</th>
+          					<th>Username</th>
+                    <!-- <th>Max Likes</th> -->
+                    <th>Number of posts</th>
+                    <th>Total Likes</th>
+                  </tr>
+               </thead>
+               <tbody>
+                 {%  for user in users %}
+                    <tr>
+                        <th>{{user.id}}</th>
+                        <th><a href="{% url 'user' user_id=user.id%}">{{user.username}}</a></th>
+                        {% for x in num_post %}
+                          {% if user.id == x.user_id %}
+                            <th>{{ x.count }}</th>
+                          {% endif %}
+                        {% endfor %}
+                        {% for x in num_like %}
+                          {% if user.id == x.id %}
+                            <th>{{ x.count }}</th>
+                          {% endif %}
+                        {% endfor %}
+                    </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="thumbnail">
+            <h3>Author's Most Popular Posts</h3>
+            <ul class="">
+                <li><a href="#">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                    </div>
+                    <div class="col-sm-2">
+                      <p>Mingsum</p><br>
+                    </div>
+                  </div>
+                </a></li>
+                <li><a href="#">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                    </div>
+                    <div class="col-sm-2">
+                      <p>Mingsum</p><br>
+                    </div>
+                  </div>
+                </a></li>
+                <li><a href="#">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                    </div>
+                    <div class="col-sm-2">
+                      <p>Mingsum</p><br>
+                    </div>
+                  </div>
+                </a></li>
+                <li><a href="#">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                    </div>
+                    <div class="col-sm-2">
+                      <p>Mingsum</p><br>
+                    </div>
+                  </div>
+                </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <footer class="container-fluid bg-2 text-center">
+    <br><br><br>
+    <p>Site by <a href="#">Tetiana Nesterchuk</a></p>
+  </footer>
+
+</body>
+</html>

@@ -63,11 +63,6 @@ class User(models.Model):
       pw_hash = models.CharField(max_length=255)
       created_at = models.DateTimeField(auto_now_add = True)
       updated_at = models.DateTimeField(auto_now = True)
-      def update_filename(instance, filename):
-        path = "upload/path/"
-        format = instance.userid + instance.transaction_uuid + instance.file_extension
-        return os.path.join(path, format)
-
       objects = models.Manager()
       manager = UserManager()
 

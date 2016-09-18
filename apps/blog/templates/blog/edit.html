@@ -3,42 +3,168 @@
 <head>
     <meta charset="utf-8">
     <title>Blog</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'blog/css/main.css'%}">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
-  <h2>Edit User {{user.id}}</h2>
-  {% if messages %}
-    <div class="errors">
-       {% for message in messages %}
-       <h4{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h4>
-       {% endfor %}
+  <div class="container bg-1">
+    <h1 class="text-center">MY BLOG</h1>
+    <h2 class="text-center">Edit</h2>
+    <br><br>
+    <div class="row">
+      <div class="col-sm-7">
+        <div class="row">
+          <div class="thumbnail shadow">
+            <h2>Edit User {{user.id}}</h2>
+            {% if messages %}
+              <div class="errors">
+                 {% for message in messages %}
+                 <h4{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</h4>
+                 {% endfor %}
+              </div>
+            {% endif %}
+            <form class="edit black" action="{% url 'update'%}" method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <label for="image">Image: </label>
+              <input type="file" name="image">
+              <label for="username">Username: </label>
+              <input type="text" name="username" value="{{user.username}}">
+              <input type="submit" value="Submit">
+            </form>
+            <br><br>
+            <form class="edit black" action="{% url 'update_pass' %}" method="post">
+              {% csrf_token %}
+              <input type="hidden" name="email" value="{{user.username}}">
+              <label for="old_password">Existing Password:</label>
+              <input type="password" name="old_password">
+              <label for="password">New Password:</label>
+              <input type="password" name="password">
+              <label for="repeat">Repeat the New Password:</label>
+              <input type="password" name="repeat">
+              <input type="submit" value="Submit">
+            </form>
+            <br>
+            <a href="{%url 'user' user_id=user.id%}">Back</a>
+           </div>
+        </div>
+      </div>
+
+
+      <div class="col-sm-4 left-margin">
+        <div class="row">
+          <div class="thumbnail">
+            <h3>Navigation</h3>
+            <a href="{% url 'main'%}">Main</a>
+            {% if request.session.user %}
+                {% if not user.id == request.session.user%}
+                  - <a href="{% url 'show' user_id=request.session.user%}">My page</a>
+                {%endif%}
+                - <a href="{% url 'logout' %}">Logout</a>
+            {% else %}
+                - <a href="{% url 'login'%}">Login/Register</a>
+            {%endif%}
+          </div>
+        </div>
+
+
+        <div class="row">
+          <div class="thumbnail">
+            <h2>Users:</h2>
+            <table>
+               <thead>
+                  <tr>
+                    <th>Id</th>
+                    <th>Username</th>
+                    <!-- <th>Max Likes</th> -->
+                    <th>Number of posts</th>
+                    <th>Total Likes</th>
+                  </tr>
+               </thead>
+               <tbody>
+                 {%  for user in users %}
+                    <tr>
+                        <th>{{user.id}}</th>
+                        <th><a href="{% url 'user' user_id=user.id%}">{{user.username}}</a></th>
+                        {% for x in num_post %}
+                          {% if user.id == x.user_id %}
+                            <th>{{ x.count }}</th>
+                          {% endif %}
+                        {% endfor %}
+                        {% for x in num_like %}
+                          {% if user.id == x.id %}
+                            <th>{{ x.count }}</th>
+                          {% endif %}
+                        {% endfor %}
+                    </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+          </div>
+        </div>
+
+
+
+        <div class="row">
+          <div class="thumbnail">
+            <h3>Author's Most Popular Posts</h3>
+            <ul class="">
+                <li><a href="#">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                    </div>
+                    <div class="col-sm-2">
+                      <p>Mingsum</p><br>
+                    </div>
+                  </div>
+                </a></li>
+                <li><a href="#">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                    </div>
+                    <div class="col-sm-2">
+                      <p>Mingsum</p><br>
+                    </div>
+                  </div>
+                </a></li>
+                <li><a href="#">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                    </div>
+                    <div class="col-sm-2">
+                      <p>Mingsum</p><br>
+                    </div>
+                  </div>
+                </a></li>
+                <li><a href="#">
+                  <div class="row">
+                    <div class="col-sm-5">
+                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
+                    </div>
+                    <div class="col-sm-2">
+                      <p>Mingsum</p><br>
+                    </div>
+                  </div>
+                </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
-  {% endif %}
-  <form class="edit" action="{% url 'update'%}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <label for="image">Image: </label>
-    <input type="file" name="image">
-    <label for="username">Username: </label>
-    <input type="text" name="username" value="{{user.username}}">
-    <input type="submit" value="Submit">
-  </form>
-  <!-- <form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{form.as_p}}
-    <input type="submit" value="Submit">
-  </form> -->
-  <br><br>
-  <form class="edit" action="{% url 'update_pass' %}" method="post">
-    {% csrf_token %}
-    <input type="hidden" name="email" value="{{user.username}}">
-    <label for="old_password">Existing Password:</label>
-    <input type="password" name="old_password">
-    <label for="password">New Password:</label>
-    <input type="password" name="password">
-    <label for="repeat">Repeat the New Password:</label>
-    <input type="password" name="repeat">
-    <input type="submit" value="Submit">
-  </form>
-  <br>
-  <a href="{%url 'show' user_id=user.id%}">Back</a>
+  </div>
+
+
+  <footer class="container-fluid bg-2 text-center">
+    <br><br><br>
+    <p>Site by <a href="#">Tetiana Nesterchuk</a></p>
+  </footer>
+
+
+
 </body>
 </html>

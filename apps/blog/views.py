@@ -10,36 +10,40 @@ def index(request):
     return render(request, 'blog/index.html')
 
 def login(request):
-    return render(request, 'blog/login.html')
+    context = random_users(request)
+    return render(request, 'blog/login.html', context)
 
-def register(request):
-    return render(request, 'blog/register.html')
 
 def post(request, post_id):
     post = Post.objects.get(id=post_id)
     context = {'post':post}
     return render(request, 'blog/post.html', context)
 
-def show(request, user_id):
-    # if not 'user' in request.session:
-    #     return redirect(reverse('index'))
+def user(request, user_id):
     user = User.manager.get(id=user_id)
     posts = Post.objects.filter(user_id=user_id)
     comments = Comment.objects.all()
     context = {'user':user, 'posts':posts, 'comments': comments}
-    return render(request, 'blog/show.html', context)
+    return render(request, 'blog/user.html', context)
 
 def edit(request):
     user = User.objects.get(id = request.session['user'])
+    random = random_users(request)
     context = {'user':user}
+    context.update(random)
     return render(request, 'blog/edit.html', context)
 
-def dashboard(request):
-    users = User.objects.all().order_by('-username')
-    context = {'users':users}
+def main(request):
+    extra = User.objects.all()
     latest = Post.objects.all().order_by('-created_at')[:4]
     liked = Post.objects.all().order_by('-like')[:4]
+    random = random_users(request)
+    context = {'latest':latest, 'liked':liked}
+    context.update(random)
+    return render(request, 'blog/main.html', context)
 
+def random_users(request):
+    users = User.objects.all()
     num_like = User.objects.all()
     num_like = []
     for x in users:
@@ -52,9 +56,9 @@ def dashboard(request):
         pack.update({'id':x.id})
         num_like.append(pack)
     num_post = Post.objects.all().values('user_id').annotate(count=Count('user_id')).order_by('-count')
+    context = {'users':users,'num_like':num_like, 'num_post':num_post}
+    return context
 
-    context = {'users':users, 'latest':latest, 'liked':liked, 'num_like':num_like, 'num_post':num_post}
-    return render(request, 'blog/dashboard.html', context)
 
 def deletion_page(request):
     return render(request, 'blog/delete.html')
@@ -83,7 +87,7 @@ def print_messages(request, message_list):
 
 def log_user_in(request, user):
     request.session['user'] = user.id
-    return redirect(reverse('show', kwargs={'user_id':request.session['user']}))
+    return redirect(reverse('user', kwargs={'user_id':request.session['user']}))
 
 def update(request):
     user = User.manager.get(id=request.session['user'])
@@ -114,7 +118,7 @@ def update_pass(request):
     update = User.objects.get(id = request.session['user'])
     update.pw_hash = pw_hash
     update.save(update_fields=None)
-    return redirect(reverse('dashboard_show', kwargs={'user_id':request.session['user']}))
+    return redirect(reverse('main', kwargs={'user_id':request.session['user']}))
 
 def logout(request):
     user = User.manager.get(id=request.session['user'])
@@ -136,9 +140,9 @@ def add_post(request):
             Post.objects.create(image = request.FILES['image'], title = request.POST['title'], post = request.POST['post'], user_id = user)
         else:
             Post.objects.create(title = request.POST['title'], post = request.POST['post'], user_id = user)
-        return redirect(reverse('show', kwargs={'user_id':request.session['user']}))
+        return redirect(reverse('user', kwargs={'user_id':request.session['user']}))
     else:
-	    return redirect(reverse('show'))
+	    return redirect(reverse('user'))
 
 def add_comment(request, post_id):
     if request.method == "POST":
@@ -146,6 +150,6 @@ def add_comment(request, post_id):
         message = Message.objects.get(id=message_id)
         page = message.user_id_to.id
         Comment.objects.create(comment = request.POST['comment'], user_id = user, message_id = message)
-        return redirect(reverse('show', kwargs={'user_id':page}))
+        return redirect(reverse('user', kwargs={'user_id':page}))
     else:
-	    return redirect(reverse('show'))
+	    return redirect(reverse('user'))
