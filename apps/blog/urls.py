@@ -2,12 +2,10 @@ from django.conf.urls import url
 from . import views
 urlpatterns = [
     url(r'^$', views.index, name='index'),
-    url(r'^user/main$', views.main, name='main'),
+    url(r'^blog/main$', views.main, name='main'),
     url(r'^blog/(?P<user_id>\d+)$', views.user, name='user'),
-
     url(r'^blog/login$', views.login, name='login'),
     url(r'^blog/edit$', views.edit, name='edit'),
-    url(r'^blog/deletion_page$', views.deletion_page, name='deletion_page'),
     url(r'^blog/post/(?P<post_id>\d+)$', views.post, name='post'),
 
     url(r'^blog/login_process$', views.login_process, name='login_process'),
@@ -17,7 +15,8 @@ urlpatterns = [
     url(r'^blog/logout$', views.logout, name='logout'),
     url(r'^blog/delete$', views.delete, name='delete'),
 
-    url(r'^user/add_post$', views.add_post, name='add_post'),
-    url(r'^user/(?P<post_id>\d+)/add_comment$', views.add_comment, name='add_comment')
+    url(r'^blog/add_post$', views.add_post, name='add_post'),
+    url(r'^blog/post/(?P<post_id>\d+)/add_comment$', views.add_comment, name='add_comment'),
+    url(r'^blog/post/(?P<post_id>\d+)/add_like$', views.add_like, name='add_like'),
 
 ]

@@ -65,22 +65,27 @@ class User(models.Model):
       updated_at = models.DateTimeField(auto_now = True)
       objects = models.Manager()
       manager = UserManager()
+      def __unicode__(self):
+          return u"%s" % (self.username)
 
-class Tag(models.Model):
-      name = models.CharField(max_length=45)
-      use = models.PositiveIntegerField(default = 0)
-      created_at = models.DateTimeField(auto_now_add=True)
-      updated_at = models.DateTimeField(auto_now=True)
 
 class Post(models.Model):
       title = models.CharField(max_length=100)
       post = models.TextField()
       image = models.ImageField(upload_to='post/', null=True, blank=True)
       user_id = models.ForeignKey(User)
-      tags = models.ManyToManyField(Tag, related_name='post_tag')
-      like = models.PositiveIntegerField(default = 0)
       created_at = models.DateTimeField(auto_now_add=True)
       updated_at = models.DateTimeField(auto_now=True)
+      def __unicode__(self):
+          return u"%s" % (self.title)
+
+
+class Like(models.Model):
+      user_id = models.ForeignKey(User)
+      post_id = models.ForeignKey(Post)
+      def __unicode__(self):
+          return u"post:%s - user:%s" % (self.post_id,self.user_id)
+
 
 class Comment(models.Model):
       comment = models.TextField(max_length=1000)
@@ -88,3 +93,5 @@ class Comment(models.Model):
       post_id = models.ForeignKey(Post)
       created_at = models.DateTimeField(auto_now_add=True)
       updated_at = models.DateTimeField(auto_now=True)
+      def __unicode__(self):
+          return u"%s" % (self.comment)

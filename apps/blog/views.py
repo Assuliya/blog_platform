@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.contrib import messages
 from django.db.models import Count
-from models import User, Post, Comment,Tag
+from models import User, Post, Comment, Like
 # from forms import UserForm
 import bcrypt
+
 
 def index(request):
     return render(request, 'blog/index.html')
@@ -13,10 +14,17 @@ def login(request):
     context = random_users(request)
     return render(request, 'blog/login.html', context)
 
-
 def post(request, post_id):
     post = Post.objects.get(id=post_id)
-    context = {'post':post}
+    comments = Comment.objects.filter(post_id=post_id)
+    user_like = Like.objects.filter(post_id=post_id)
+    likes = Like.objects.filter(post_id=post_id).values('post_id').annotate(count=Count('post_id'))
+    print likes
+    before = False
+    for x in user_like:
+        if x.user_id.id == request.session['user']:
+            before = True
+    context = {'post':post, 'comments':comments, 'likes':likes, 'before':before}
     return render(request, 'blog/post.html', context)
 
 def user(request, user_id):
@@ -34,6 +42,7 @@ def edit(request):
     return render(request, 'blog/edit.html', context)
 
 def main(request):
+
     extra = User.objects.all()
     latest = Post.objects.all().order_by('-created_at')[:4]
     liked = Post.objects.all().order_by('-like')[:4]
@@ -42,26 +51,34 @@ def main(request):
     context.update(random)
     return render(request, 'blog/main.html', context)
 
-def random_users(request):
-    users = User.objects.all()
-    num_like = User.objects.all()
-    num_like = []
-    for x in users:
-        z = Post.objects.filter(user_id__id = x.id)
-        like_total = 0
-        for post in z:
-            like_total += post.like
-        pack = {}
-        pack.update({'count':like_total})
-        pack.update({'id':x.id})
-        num_like.append(pack)
-    num_post = Post.objects.all().values('user_id').annotate(count=Count('user_id')).order_by('-count')
-    context = {'users':users,'num_like':num_like, 'num_post':num_post}
-    return context
-
-
 def deletion_page(request):
     return render(request, 'blog/delete.html')
+
+def random_users(request):
+    import random
+    order = ['-created_at', 'created_at', '-username', 'username']
+    rnd_order = (random.choice(order))
+    raw_users = User.objects.all().order_by(rnd_order)
+    x = (random.choice(raw_users)).id
+    if x > len(raw_users) - 3:
+        x -= 3
+    users = raw_users[x:x+3]
+
+    # num_like = User.objects.all()
+    # num_like = []
+    # for x in users:
+    #     z = Post.objects.filter(user_id__id = x.id)
+    #     like_total = 0
+    #     for post in z:
+    #         like_total += post.like
+    #     pack = {}
+    #     pack.update({'count':like_total})
+    #     pack.update({'id':x.id})
+    #     num_like.append(pack)
+
+    num_post = Post.objects.all().values('user_id').annotate(count=Count('user_id')).order_by('-count')
+    context = {'users':users, 'num_post':num_post}
+    return context
 
 def register_process(request):
     result = User.manager.validateReg(request)
@@ -147,9 +164,17 @@ def add_post(request):
 def add_comment(request, post_id):
     if request.method == "POST":
         user = User.objects.get(id=request.session['user'])
-        message = Message.objects.get(id=message_id)
-        page = message.user_id_to.id
-        Comment.objects.create(comment = request.POST['comment'], user_id = user, message_id = message)
-        return redirect(reverse('user', kwargs={'user_id':page}))
+        post = Post.objects.get(id=post_id)
+        Comment.objects.create(comment = request.POST['comment'], user_id = user, post_id = post)
+        return redirect(reverse('post', kwargs={'post_id':post_id}))
     else:
 	    return redirect(reverse('user'))
+
+def add_like(request, post_id):
+    if request.method == "POST":
+        post = Post.objects.get(id=post_id)
+        user = User.objects.get(id=request.session['user'])
+        Like.objects.create(user_id = user, post_id = post)
+        return redirect(reverse('post', kwargs={'post_id':post_id}))
+    else:
+	    return redirect(reverse('post'))
