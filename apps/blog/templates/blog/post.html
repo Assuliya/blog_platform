@@ -22,16 +22,25 @@
               <img src='{{post.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
             {% endif %}
             <p>{{post.post}}</p>
-            <h4>{{post.created_at}}</h4>
-            {% if request.session.user != post.user_id.id and before == False%}
-              <a href=""></a>
-              <form action="{% url 'add_like' post_id=post.id%}" method='post'>
-                {% csrf_token %}
-                <button type="submit" >Like</button>
-              </form>
-            {% endif %}
-            <h3>Likes: {{likes.0.count}}</h3>
-
+            <div class="row">
+              <div class="col-sm-10">
+                <h5>{{post.created_at}}</h5>
+              </div>
+              <div class="col-sm-2">
+                {% if likes.0.count %}
+                <h3>Likes: {{likes.0.count}}</h3>
+                {% else %}
+                <h3>Likes: 0</h3>
+                {% endif %}
+                {% if request.session.user != post.user_id.id and before == False%}
+                  <a href=""></a>
+                  <form action="{% url 'add_like' post_id=post.id%}" method='post'>
+                    {% csrf_token %}
+                    <button type="submit" >Like</button>
+                  </form>
+                {% endif %}
+              </div>
+            </div>
           </div>
           <div class="thumbnail add shadow text-right">
             <form action="{% url 'add_comment' post_id=post.id%}" method='post'>

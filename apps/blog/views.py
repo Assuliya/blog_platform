@@ -42,12 +42,17 @@ def edit(request):
     return render(request, 'blog/edit.html', context)
 
 def main(request):
-
     extra = User.objects.all()
     latest = Post.objects.all().order_by('-created_at')[:4]
-    liked = Post.objects.all().order_by('-like')[:4]
+    posts = Post.objects.all()
+    count = Like.objects.all().values('post_id').annotate(count=Count('post_id')).order_by('-count')[:4]
+    liked = []
+    for x in posts:
+        for y in count:
+            if x.id == y['post_id']:
+                liked.append([x,y['count']])
     random = random_users(request)
-    context = {'latest':latest, 'liked':liked}
+    context = {'latest':latest, 'liked':liked, 'count':count}
     context.update(random)
     return render(request, 'blog/main.html', context)
 
@@ -64,20 +69,9 @@ def random_users(request):
         x -= 3
     users = raw_users[x:x+3]
 
-    # num_like = User.objects.all()
-    # num_like = []
-    # for x in users:
-    #     z = Post.objects.filter(user_id__id = x.id)
-    #     like_total = 0
-    #     for post in z:
-    #         like_total += post.like
-    #     pack = {}
-    #     pack.update({'count':like_total})
-    #     pack.update({'id':x.id})
-    #     num_like.append(pack)
-
+    num_like = Like.objects.all().values('post_id__user_id').annotate(count=Count('post_id__user_id'))
     num_post = Post.objects.all().values('user_id').annotate(count=Count('user_id')).order_by('-count')
-    context = {'users':users, 'num_post':num_post}
+    context = {'users':users, 'num_like':num_like, 'num_post':num_post}
     return context
 
 def register_process(request):

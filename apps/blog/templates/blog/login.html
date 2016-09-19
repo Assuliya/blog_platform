@@ -99,7 +99,7 @@
                           {% endif %}
                         {% endfor %}
                         {% for x in num_like %}
-                          {% if user.id == x.id %}
+                          {% if user.id == x.post_id__user_id %}
                             <th>{{ x.count }}</th>
                           {% endif %}
                         {% endfor %}
