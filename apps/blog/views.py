@@ -19,7 +19,6 @@ def post(request, post_id):
     comments = Comment.objects.filter(post_id=post_id)
     user_like = Like.objects.filter(post_id=post_id)
     likes = Like.objects.filter(post_id=post_id).values('post_id').annotate(count=Count('post_id'))
-    print likes
     before = False
     for x in user_like:
         if x.user_id.id == request.session['user']:
@@ -29,9 +28,12 @@ def post(request, post_id):
 
 def user(request, user_id):
     user = User.manager.get(id=user_id)
-    posts = Post.objects.filter(user_id=user_id)
+    posts = Post.objects.filter(user_id=user_id).order_by('-created_at')
     comments = Comment.objects.all()
-    context = {'user':user, 'posts':posts, 'comments': comments}
+    count = Like.objects.all().values('post_id').annotate(count=Count('post_id'))
+    likes = Like.objects.all().values('post_id').annotate(count=Count('post_id'))
+    print likes
+    context = {'user':user, 'posts':posts, 'comments': comments, 'count': count, 'likes': likes}
     return render(request, 'blog/user.html', context)
 
 def edit(request):

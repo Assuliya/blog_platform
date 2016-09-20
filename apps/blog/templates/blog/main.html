@@ -30,11 +30,22 @@
                   <p>{{post.user_id.username}}</p>
                 </div>
                 <div class="col-sm-3">
-                  <p>{{post.title}}</p>
+                  <h4>{{post.title}}</h4>
                   <p>{{post.created_at}}</p>
                 </div>
-                <div class="col-sm-6">
-                  <p>{{post.post}}</p>
+                <div class="col-sm-4">
+                  {% if post.post|length > 100 %}
+                    <p>{{post.post|slice:":100"}}...</p>
+                  {% else %}
+                    <p>{{post.post}}</p>
+                  {% endif %}
+                </div>
+                <div class="col-sm-2">
+                  {% if post.1 %}
+                    <p>Likes: {{post.1}}</p>
+                  {% else %}
+                    <p>Likes: 0</p>
+                  {% endif %}
                 </div>
               </div></a></li>
             {% endfor %}
@@ -55,14 +66,22 @@
                   <p>{{post.0.user_id.username}}</p>
                 </div>
                 <div class="col-sm-3">
-                  <p>{{post.0.title}}</p>
+                  <h4>{{post.0.title}}</h4>
                   <p>{{post.0.created_at}}</p>
                 </div>
-                <div class="col-sm-5">
-                  <p>{{post.0.post}}</p>
+                <div class="col-sm-4">
+                  {% if post.0.post|length > 100 %}
+                    <p>{{post.0.post|slice:":100"}}...</p>
+                  {% else %}
+                    <p>{{post.0.post}}</p>
+                  {% endif %}
                 </div>
-                <div class="col-sm-1">
-                  <p>{{post.1}}</p>
+                <div class="col-sm-2">
+                  {% if post.1 %}
+                    <p>Likes: {{post.1}}</p>
+                  {% else %}
+                    <p>Likes: 0</p>
+                  {% endif %}
                 </div>
               </div></a></li>
             {% endfor %}
@@ -90,13 +109,11 @@
 
         <div class="row">
           <div class="thumbnail">
-            <h2>Users:</h2>
-            <table>
+            <h3>Random Users:</h3>
+            <table class="table">
                <thead>
                   <tr>
-                    <th>Id</th>
           					<th>Username</th>
-                    <!-- <th>Max Likes</th> -->
                     <th>Number of posts</th>
                     <th>Total Likes</th>
                   </tr>
@@ -104,7 +121,6 @@
                <tbody>
                  {%  for user in users %}
                     <tr>
-                        <th>{{user.id}}</th>
                         <th><a href="{% url 'user' user_id=user.id%}">{{user.username}}</a></th>
                         {% for x in num_post %}
                           {% if user.id == x.user_id %}
