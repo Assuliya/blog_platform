@@ -24,6 +24,8 @@ def post(request, post_id):
         if x.user_id.id == request.session['user']:
             before = True
     context = {'post':post, 'comments':comments, 'likes':likes, 'before':before}
+    if 'user' in request.session:
+        context.update(user_liked(request))
     return render(request, 'blog/post.html', context)
 
 def user(request, user_id):
@@ -32,8 +34,24 @@ def user(request, user_id):
     comments = Comment.objects.all()
     count = Like.objects.all().values('post_id').annotate(count=Count('post_id'))
     likes = Like.objects.all().values('post_id').annotate(count=Count('post_id'))
-    print likes
-    context = {'user':user, 'posts':posts, 'comments': comments, 'count': count, 'likes': likes}
+
+    import random
+    order = [ '-post_id_id', 'post_id_id','-created_at', 'created_at']
+    rnd_order = (random.choice(order))
+    raw_liked = Like.objects.filter(user_id=user_id).order_by(rnd_order)
+    x = list(raw_liked).index(random.choice(raw_liked))
+    if x > len(raw_liked) - 4:
+        x -= 4
+        if x < 0:
+            x = 0
+    if len(raw_liked) < 4:
+        x = 0
+        y = x+len(raw_liked)
+    else:
+        y = x+4
+    user_liked  = raw_liked[x:y]
+    print raw_liked
+    context = {'user':user, 'posts':posts, 'comments': comments, 'count': count, 'likes': likes, 'user_liked':user_liked}
     return render(request, 'blog/user.html', context)
 
 def edit(request):
@@ -41,6 +59,8 @@ def edit(request):
     random = random_users(request)
     context = {'user':user}
     context.update(random)
+    if 'user' in request.session:
+        context.update(user_liked(request))
     return render(request, 'blog/edit.html', context)
 
 def main(request):
@@ -56,6 +76,8 @@ def main(request):
     random = random_users(request)
     context = {'latest':latest, 'liked':liked, 'count':count}
     context.update(random)
+    if 'user' in request.session:
+        context.update(user_liked(request))
     return render(request, 'blog/main.html', context)
 
 def deletion_page(request):
@@ -69,11 +91,31 @@ def random_users(request):
     x = (random.choice(raw_users)).id
     if x > len(raw_users) - 3:
         x -= 3
+        if x < 0:
+            x = 0
     users = raw_users[x:x+3]
-
     num_like = Like.objects.all().values('post_id__user_id').annotate(count=Count('post_id__user_id'))
     num_post = Post.objects.all().values('user_id').annotate(count=Count('user_id')).order_by('-count')
     context = {'users':users, 'num_like':num_like, 'num_post':num_post}
+    return context
+
+def user_liked(request):
+    import random
+    order = [ '-post_id_id', 'post_id_id','-created_at', 'created_at']
+    rnd_order = (random.choice(order))
+    raw_liked = Like.objects.filter(user_id=request.session['user']).order_by(rnd_order)
+    x = list(raw_liked).index(random.choice(raw_liked))
+    if x > len(raw_liked) - 4:
+        x -= 4
+        if x < 0:
+            x = 0
+    if len(raw_liked) < 4:
+        x = 0
+        y = x+len(raw_liked)
+    else:
+        y = x+4
+    user_liked  = raw_liked[x:y]
+    context = {'user_liked':user_liked}
     return context
 
 def register_process(request):

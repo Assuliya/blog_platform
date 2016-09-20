@@ -107,49 +107,31 @@
 
         <div class="row">
           <div class="thumbnail">
-            <h3>Author's Most Popular Posts</h3>
-            <ul class="">
-                <li><a href="#">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
-                    </div>
-                    <div class="col-sm-2">
-                      <p>Mingsum</p><br>
-                    </div>
-                  </div>
-                </a></li>
-                <li><a href="#">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
-                    </div>
-                    <div class="col-sm-2">
-                      <p>Mingsum</p><br>
-                    </div>
-                  </div>
-                </a></li>
-                <li><a href="#">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
-                    </div>
-                    <div class="col-sm-2">
-                      <p>Mingsum</p><br>
-                    </div>
-                  </div>
-                </a></li>
-                <li><a href="#">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
-                    </div>
-                    <div class="col-sm-2">
-                      <p>Mingsum</p><br>
-                    </div>
-                  </div>
-                </a></li>
-            </ul>
+            <h3>Posts you liked:</h3>
+            {% if user_liked %}
+              <ul class="">
+                    {% for like in user_liked%}
+                      <li><a href="{% url 'post' post_id=like.post_id.id%}">
+                        <div class="row">
+                          <div class="col-sm-5">
+                            <img src='/media/{{like.post_id.image}}'  class="img-responsive" style="width:100%" alt="image">
+                            <p class="green">{{like.post_id.user_id.username}}</p>
+                          </div>
+                          <div class="col-sm-7">
+                            <div class="row">
+                                <h4 class="green">{{like.post_id.title}}</h4>
+                            </div>
+                            <div class="row">
+                              <p>{{like.post_id.created_at}}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </a></li>
+                  {% endfor %}
+              </ul>
+            {% else %}
+              <p>You have no liked posts</p>
+            {% endif %}
           </div>
         </div>
       </div>

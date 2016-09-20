@@ -83,6 +83,8 @@ class Post(models.Model):
 class Like(models.Model):
       user_id = models.ForeignKey(User)
       post_id = models.ForeignKey(Post)
+      created_at = models.DateTimeField(auto_now_add=True)
+      updated_at = models.DateTimeField(auto_now=True)
       def __unicode__(self):
           return u"post:%s - user:%s" % (self.post_id,self.user_id)
 
