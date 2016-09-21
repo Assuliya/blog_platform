@@ -34,23 +34,25 @@ def user(request, user_id):
     comments = Comment.objects.all()
     count = Like.objects.all().values('post_id').annotate(count=Count('post_id'))
     likes = Like.objects.all().values('post_id').annotate(count=Count('post_id'))
-
     import random
     order = [ '-post_id_id', 'post_id_id','-created_at', 'created_at']
     rnd_order = (random.choice(order))
     raw_liked = Like.objects.filter(user_id=user_id).order_by(rnd_order)
-    x = list(raw_liked).index(random.choice(raw_liked))
-    if x > len(raw_liked) - 4:
-        x -= 4
-        if x < 0:
+    if raw_liked:
+        x = list(raw_liked).index(random.choice(raw_liked))
+        if x > len(raw_liked) - 4:
+            x -= 4
+            if x < 0:
+                x = 0
+        if len(raw_liked) < 4:
             x = 0
-    if len(raw_liked) < 4:
-        x = 0
-        y = x+len(raw_liked)
+            y = x+len(raw_liked)
+        else:
+            y = x+4
+        user_liked  = raw_liked[x:y]
+        print raw_liked
     else:
-        y = x+4
-    user_liked  = raw_liked[x:y]
-    print raw_liked
+        user_liked = False
     context = {'user':user, 'posts':posts, 'comments': comments, 'count': count, 'likes': likes, 'user_liked':user_liked}
     return render(request, 'blog/user.html', context)
 
@@ -104,17 +106,20 @@ def user_liked(request):
     order = [ '-post_id_id', 'post_id_id','-created_at', 'created_at']
     rnd_order = (random.choice(order))
     raw_liked = Like.objects.filter(user_id=request.session['user']).order_by(rnd_order)
-    x = list(raw_liked).index(random.choice(raw_liked))
-    if x > len(raw_liked) - 4:
-        x -= 4
-        if x < 0:
+    if raw_liked:
+        x = list(raw_liked).index(random.choice(raw_liked))
+        if x > len(raw_liked) - 4:
+            x -= 4
+            if x < 0:
+                x = 0
+        if len(raw_liked) < 4:
             x = 0
-    if len(raw_liked) < 4:
-        x = 0
-        y = x+len(raw_liked)
+            y = x+len(raw_liked)
+        else:
+            y = x+4
+        user_liked  = raw_liked[x:y]
     else:
-        y = x+4
-    user_liked  = raw_liked[x:y]
+        user_liked = False
     context = {'user_liked':user_liked}
     return context
 
@@ -150,7 +155,7 @@ def update(request):
         result = User.manager.validateReg(request)
         if result[0] == False:
             print_messages(request, result[1])
-            return redirect(reverse('edit', kwargs={'user_id':request.session['user']}))
+            return redirect(reverse('edit'))
 
     update = User.objects.get(id = request.session['user'])
     update.username = request.POST['username']
@@ -158,6 +163,7 @@ def update(request):
         request.FILES['image'].name = request.POST['username']
         update.image = request.FILES['image']
     update.save()
+    print_messages(request, ["Successfully updated information"])
     return redirect(reverse('show', kwargs={'user_id':request.session['user']}))
 
 def update_pass(request):
@@ -168,12 +174,13 @@ def update_pass(request):
             print_messages(request, result[1])
         else:
             print_messages(request, result2[1])
-        return redirect(reverse('edit', kwargs={'user_id':request.session['user']}))
+        return redirect(reverse('edit'))
     pw_hash = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
     update = User.objects.get(id = request.session['user'])
     update.pw_hash = pw_hash
-    update.save(update_fields=None)
-    return redirect(reverse('main', kwargs={'user_id':request.session['user']}))
+    update.save()
+    print_messages(request, ["Successfully updated password"])
+    return redirect(reverse('edit'))
 
 def logout(request):
     user = User.manager.get(id=request.session['user'])

@@ -42,7 +42,7 @@ class UserManager(models.Manager):
         try:
 	        user = self.get(username=request.POST['username'])
 	        password = user.pw_hash.encode()
-	        loginpass = request.POST['password'].encode()
+	        loginpass = request.POST['old_password'].encode()
 	        print password
 	        print hashpw(loginpass, password)
 	        if hashpw(loginpass, password) == password:

@@ -17,8 +17,6 @@
     <div class="row">
       <div class="col-sm-7">
         <div class="row">
-          <div class="thumbnail shadow">
-            <h2>Edit User {{user.id}}</h2>
             {% if messages %}
               <div class="errors">
                  {% for message in messages %}
@@ -26,32 +24,38 @@
                  {% endfor %}
               </div>
             {% endif %}
-            <form class="edit black" action="{% url 'update'%}" method="post" enctype="multipart/form-data">
-              {% csrf_token %}
-              <label for="image">Image: </label>
-              <input type="file" name="image">
-              <label for="username">Username: </label>
-              <input type="text" name="username" value="{{user.username}}">
-              <input type="submit" value="Submit">
-            </form>
+            <div class="thumbnail shadow">
+              <h3>Edit the username:</h3>
+              <form class="edit black" action="{% url 'update'%}" method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <label for="image"><p>Image: </p></label>
+                <input type="file" class="edit black" name="image">
+                <label for="username"><p>Username: </p></label>
+                <input type="text" class="edit black form-control" name="username" value="{{user.username}}">
+                <br>
+                <input type="submit" value="Submit">
+              </form>
+            </div>
             <br><br>
-            <form class="edit black" action="{% url 'update_pass' %}" method="post">
-              {% csrf_token %}
-              <input type="hidden" name="email" value="{{user.username}}">
-              <label for="old_password">Existing Password:</label>
-              <input type="password" name="old_password">
-              <label for="password">New Password:</label>
-              <input type="password" name="password">
-              <label for="repeat">Repeat the New Password:</label>
-              <input type="password" name="repeat">
-              <input type="submit" value="Submit">
-            </form>
+            <div class="thumbnail shadow">
+              <h3>Edit the password:</h3>
+              <form class="edit black" action="{% url 'update_pass' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" class="edit black form-control" name="username" value="{{user.username}}">
+                <label for="old_password"><p>Existing Password:</p></label>
+                <input type="password" class="edit black form-control" name="old_password">
+                <label for="password"><p>New Password:</p></label>
+                <input type="password" class="edit black form-control" name="password">
+                <label for="repeat"><p>Repeat the New Password:</p></label>
+                <input type="password" class="edit black form-control" name="repeat">
+                <br>
+                <input type="submit" value="Submit">
+              </form>
+            </div>
             <br>
             <a href="{%url 'user' user_id=user.id%}">Back</a>
-           </div>
         </div>
       </div>
-
 
       <div class="col-sm-4 left-margin">
         <div class="row">

@@ -28,8 +28,9 @@
             {% endif %}
             <form action="{% url 'login_process' %}" method='post'>
               {% csrf_token %}
-              Username <input class="black"  type="text" name="username">
-              Password <input class="black"  type="password" name="password">
+              Username <input class="black form-control"  type="text" name="username">
+              Password <input class="black form-control"  type="password" name="old_password">
+              <br>
               <input type="submit" value="Login" class="black" >
             </form>
             <br>
@@ -46,9 +47,10 @@
              {% endif %}
              <form action="{% url 'register_process' %}" method='post'>
                {% csrf_token %}
-               Username <input class="black"  type="text" name="username">
-               Password <input class="black"  type="password" name="password">
-               Confirm Password <input class="black"  type="password" name="repeat">
+               Username <input class="black form-control"  type="text" name="username">
+               Password <input class="black form-control"  type="password" name="password">
+               Confirm Password <input class="black form-control"  type="password" name="repeat">
+               <br>
                <input type="submit" value="Register" class="black" >
              </form>
              <br>
@@ -105,56 +107,6 @@
                   {% endfor %}
                </tbody>
             </table>
-          </div>
-        </div>
-
-
-
-        <div class="row">
-          <div class="thumbnail">
-            <h3>Author's Most Popular Posts</h3>
-            <ul class="">
-                <li><a href="#">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
-                    </div>
-                    <div class="col-sm-2">
-                      <p>Mingsum</p><br>
-                    </div>
-                  </div>
-                </a></li>
-                <li><a href="#">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
-                    </div>
-                    <div class="col-sm-2">
-                      <p>Mingsum</p><br>
-                    </div>
-                  </div>
-                </a></li>
-                <li><a href="#">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
-                    </div>
-                    <div class="col-sm-2">
-                      <p>Mingsum</p><br>
-                    </div>
-                  </div>
-                </a></li>
-                <li><a href="#">
-                  <div class="row">
-                    <div class="col-sm-5">
-                      <img src='{% static "blog/images/bird.jpg"%}'  class="img-responsive" style="width:100%" alt="bird">
-                    </div>
-                    <div class="col-sm-2">
-                      <p>Mingsum</p><br>
-                    </div>
-                  </div>
-                </a></li>
-            </ul>
           </div>
         </div>
       </div>
