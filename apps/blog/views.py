@@ -14,6 +14,7 @@ def login(request):
     context = random_users(request)
     return render(request, 'blog/login.html', context)
 
+
 def post(request, post_id):
     post = Post.objects.get(id=post_id)
     comments = Comment.objects.filter(post_id=post_id)
@@ -66,15 +67,17 @@ def edit(request):
     return render(request, 'blog/edit.html', context)
 
 def main(request):
-    extra = User.objects.all()
     latest = Post.objects.all().order_by('-created_at')[:4]
     posts = Post.objects.all()
     count = Like.objects.all().values('post_id').annotate(count=Count('post_id')).order_by('-count')[:4]
-    liked = []
+    before_sort = []
     for x in posts:
         for y in count:
             if x.id == y['post_id']:
-                liked.append([x,y['count']])
+                before_sort.append([x,y['count']])
+    def getKey(item):
+        return item[1]
+    liked = sorted(before_sort, key=getKey, reverse=True)
     random = random_users(request)
     context = {'latest':latest, 'liked':liked, 'count':count}
     context.update(random)
@@ -82,8 +85,30 @@ def main(request):
         context.update(user_liked(request))
     return render(request, 'blog/main.html', context)
 
-def deletion_page(request):
-    return render(request, 'blog/delete.html')
+def display(request, search):
+    count = Like.objects.all().values('post_id').annotate(count=Count('post_id')).order_by('-count')
+    if search == "latest":
+        display = Post.objects.all().order_by('-created_at')
+        result = 'latest'
+    elif search == "liked":
+        posts = Post.objects.all()
+        before_sort = []
+        for x in posts:
+            for y in count:
+                if x.id == y['post_id']:
+                    before_sort.append([x,y['count']])
+        def getKey(item):
+            return item[1]
+        display = sorted(before_sort, key=getKey, reverse=True)
+        result = 'liked'
+    else:
+        return redirect(reverse('main'))
+    random = random_users(request)
+    context = {'display':display, 'count':count, 'result':result}
+    context.update(random)
+    if 'user' in request.session:
+        context.update(user_liked(request))
+    return render(request, 'blog/display.html', context)
 
 def random_users(request):
     import random
@@ -124,22 +149,26 @@ def user_liked(request):
     return context
 
 def register_process(request):
-    result = User.manager.validateReg(request)
-    resultPass = User.manager.validateRegPass(request)
-    if result[0] == False or resultPass[0] == False:
-        errors = result[1]+resultPass[1]
-        print_messages(request, errors)
-        return redirect(reverse('register'))
-    pw_hash = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
-    user = User.manager.create(username=request.POST['username'], pw_hash=pw_hash)
-    return log_user_in(request, user)
+    if request.method == "POST":
+        result = User.manager.validateReg(request)
+        resultPass = User.manager.validateRegPass(request)
+        if result[0] == False or resultPass[0] == False:
+            errors = result[1]+resultPass[1]
+            print_messages(request, errors)
+            return redirect(reverse('register'))
+        pw_hash = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
+        user = User.manager.create(username=request.POST['username'], pw_hash=pw_hash)
+        return log_user_in(request, user)
+    return redirect(reverse('main'))
 
 def login_process(request):
-    result = User.manager.validateLogin(request)
-    if result[0] == False:
-        print_messages(request, result[1])
-        return redirect(reverse('login'))
-    return log_user_in(request, result[1])
+    if request.method == "POST":
+        result = User.manager.validateLogin(request)
+        if result[0] == False:
+            print_messages(request, result[1])
+            return redirect(reverse('login'))
+        return log_user_in(request, result[1])
+    return redirect(reverse('main'))
 
 def print_messages(request, message_list):
     for message in message_list:
@@ -150,49 +179,57 @@ def log_user_in(request, user):
     return redirect(reverse('user', kwargs={'user_id':request.session['user']}))
 
 def update(request):
-    user = User.manager.get(id=request.session['user'])
-    if user.username != request.POST['username']:
-        result = User.manager.validateReg(request)
-        if result[0] == False:
-            print_messages(request, result[1])
-            return redirect(reverse('edit'))
+    if request.method == "POST":
+        user = User.manager.get(id=request.session['user'])
+        if user.username != request.POST['username']:
+            result = User.manager.validateReg(request)
+            if result[0] == False:
+                print_messages(request, result[1])
+                return redirect(reverse('edit'))
 
-    update = User.objects.get(id = request.session['user'])
-    update.username = request.POST['username']
-    if 'image' in request.FILES:
-        request.FILES['image'].name = request.POST['username']
-        update.image = request.FILES['image']
-    update.save()
-    print_messages(request, ["Successfully updated information"])
-    return redirect(reverse('show', kwargs={'user_id':request.session['user']}))
+        update = User.objects.get(id = request.session['user'])
+        update.username = request.POST['username']
+        if 'image' in request.FILES:
+            request.FILES['image'].name = request.POST['username']
+            update.image = request.FILES['image']
+        update.save()
+        print_messages(request, ["Successfully updated information"])
+        return redirect(reverse('edit'))
+    return redirect(reverse('main'))
 
 def update_pass(request):
-    result = User.manager.validateRegPass(request)
-    result2 = User.manager.validateLogin(request)
-    if result[0] == False or result2[0] == False:
-        if result2[0] != False:
-            print_messages(request, result[1])
-        else:
-            print_messages(request, result2[1])
+    if request.method == "POST":
+        result = User.manager.validateRegPass(request)
+        result2 = User.manager.validateLogin(request)
+        if result[0] == False or result2[0] == False:
+            if result2[0] != False:
+                print_messages(request, result[1])
+            else:
+                print_messages(request, result2[1])
+            return redirect(reverse('edit'))
+        pw_hash = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
+        update = User.objects.get(id = request.session['user'])
+        update.pw_hash = pw_hash
+        update.save()
+        print_messages(request, ["Successfully updated password"])
         return redirect(reverse('edit'))
-    pw_hash = bcrypt.hashpw(request.POST['password'].encode(), bcrypt.gensalt())
-    update = User.objects.get(id = request.session['user'])
-    update.pw_hash = pw_hash
-    update.save()
-    print_messages(request, ["Successfully updated password"])
-    return redirect(reverse('edit'))
+    return redirect(reverse('main'))
 
 def logout(request):
-    user = User.manager.get(id=request.session['user'])
-    user.user_level = 0
-    user.save(update_fields=None)
-    request.session.pop('user')
-    return redirect(reverse('index'))
+    if request.method == "POST":
+        user = User.manager.get(id=request.session['user'])
+        user.user_level = 0
+        user.save(update_fields=None)
+        request.session.pop('user')
+        return redirect(reverse('index'))
+    return redirect(reverse('main'))
 
 def delete(request):
-    User.objects.filter(id = request.session['user']).delete()
-    request.session.pop('user')
-    return redirect(reverse('index'))
+    if request.method == "POST":
+        User.objects.filter(id = request.session['user']).delete()
+        request.session.pop('user')
+        return redirect(reverse('index'))
+    return redirect(reverse('main'))
 
 def add_post(request):
     if request.method == "POST":

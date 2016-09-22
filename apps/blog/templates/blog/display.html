@@ -12,85 +12,80 @@
 <body>
   <div class="container bg-1">
     <h1 class="text-center">MY BLOG</h1>
-    <h2 class="text-center">Main Page</h2>
+    <h2 class="text-center">Display Page</h2>
     <br><br>
     <div class="row">
       <div class="col-sm-7">
         <div class="row">
           <div class="thumbnail shadow">
-            <h2>Latest:</h2>
-            {%  for post in latest %}
-              <li><a href="{% url 'post' post_id=post.id %}"><div class="row">
-                <div class="col-sm-3">
-                  {% if post.image.url != None %}
-                    <img src='{{post.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
-                  {% else %}
-                    <img src='/media/post/no.png' class="img-responsive" style="width:100%" alt="post_picture">
-                  {% endif %}
-                  <p class="green">{{post.user_id.username}}</p>
-                </div>
-                <div class="col-sm-3">
-                  <h4 class="green">{{post.title}}</h4>
-                  <p>{{post.created_at}}</p>
-                </div>
-                <div class="col-sm-4">
-                  {% if post.post|length > 100 %}
-                    <p>{{post.post|slice:":100"}}...</p>
-                  {% else %}
-                    <p>{{post.post}}</p>
-                  {% endif %}
-                </div>
-                <div class="col-sm-2">
-                  {% if post.1 %}
-                    <p>Likes: {{post.1}}</p>
-                  {% else %}
-                    <p>Likes: 0</p>
-                  {% endif %}
-                </div>
-              </div></a></li>
-            {% endfor %}
-            <h3><a href="{% url 'display' search='latest'%}">See all sorted by Latest</a></h3>
-          </div>
-        </div>
-        <div class="row">
-          <div class="thumbnail shadow">
-            <h2>Most Liked:</h2>
-            {%  for post in liked %}
-              <li><a href="{% url 'post' post_id=post.0.id %}"><div class="row">
-                <div class="col-sm-3">
-                  {% if post.0.image.url != None %}
-                    <img src='{{post.0.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
-                  {% else %}
-                    <img src='/media/post/no.png' class="img-responsive" style="width:100%" alt="post_picture">
-                  {% endif %}
-                  <p class="green">{{post.0.user_id.username}}</p>
-                </div>
-                <div class="col-sm-3">
-                  <h4 class="green">{{post.0.title}}</h4>
-                  <p>{{post.0.created_at}}</p>
-                </div>
-                <div class="col-sm-4">
-                  {% if post.0.post|length > 100 %}
-                    <p>{{post.0.post|slice:":100"}}...</p>
-                  {% else %}
-                    <p>{{post.0.post}}</p>
-                  {% endif %}
-                </div>
-                <div class="col-sm-2">
-                  {% if post.1 %}
-                    <p>Likes: {{post.1}}</p>
-                  {% else %}
-                    <p>Likes: 0</p>
-                  {% endif %}
-                </div>
-              </div></a></li>
-            {% endfor %}
-            <h3><a href="{% url 'display' search='liked'%}">See all sorted by Liked</a></h3>
+            {% if result == 'latest' %}
+              <h2>Latest:</h2>
+              {%  for post in display %}
+                <li><a href="{% url 'post' post_id=post.id %}"><div class="row">
+                  <div class="col-sm-3">
+                    {% if post.image.url != None %}
+                      <img src='{{post.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
+                    {% else %}
+                      <img src='/media/post/no.png' class="img-responsive" style="width:100%" alt="post_picture">
+                    {% endif %}
+                    <p class="green">{{post.user_id.username}}</p>
+                  </div>
+                  <div class="col-sm-3">
+                    <h4 class="green">{{post.title}}</h4>
+                    <p>{{post.created_at}}</p>
+                  </div>
+                  <div class="col-sm-4">
+                    {% if post.post|length > 100 %}
+                      <p>{{post.post|slice:":100"}}...</p>
+                    {% else %}
+                      <p>{{post.post}}</p>
+                    {% endif %}
+                  </div>
+                  <div class="col-sm-2">
+                    {% if post.1 %}
+                      <p>Likes: {{post.1}}</p>
+                    {% else %}
+                      <p>Likes: 0</p>
+                    {% endif %}
+                  </div>
+                </div></a></li>
+              {% endfor %}
+            {% else %}
+              <h2>Most Liked:</h2>
+              {%  for post in display %}
+                <li><a href="{% url 'post' post_id=post.0.id %}"><div class="row">
+                  <div class="col-sm-3">
+                    {% if post.0.image.url != None %}
+                      <img src='{{post.0.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
+                    {% else %}
+                      <img src='/media/post/no.png' class="img-responsive" style="width:100%" alt="post_picture">
+                    {% endif %}
+                    <p class="green">{{post.0.user_id.username}}</p>
+                  </div>
+                  <div class="col-sm-3">
+                    <h4 class="green">{{post.0.title}}</h4>
+                    <p>{{post.0.created_at}}</p>
+                  </div>
+                  <div class="col-sm-4">
+                    {% if post.0.post|length > 100 %}
+                      <p>{{post.0.post|slice:":100"}}...</p>
+                    {% else %}
+                      <p>{{post.0.post}}</p>
+                    {% endif %}
+                  </div>
+                  <div class="col-sm-2">
+                    {% if post.1 %}
+                      <p>Likes: {{post.1}}</p>
+                    {% else %}
+                      <p>Likes: 0</p>
+                    {% endif %}
+                  </div>
+                </div></a></li>
+              {% endfor %}
+            {%endif%}
           </div>
         </div>
       </div>
-
-
       <div class="col-sm-4 left-margin">
         <div class="row">
           <div class="thumbnail">
@@ -113,7 +108,7 @@
             <table class="table">
                <thead>
                   <tr>
-          					<th>Username</th>
+                    <th>Username</th>
                     <th>Number of posts</th>
                     <th>Total Likes</th>
                   </tr>
@@ -170,13 +165,14 @@
         </div>
       </div>
     </div>
-  </div>
+    </div>
 
 
-  <footer class="container-fluid bg-2 text-center">
+    <footer class="container-fluid bg-2 text-center">
     <br><br><br>
     <p>Site by <a href="#">Tetiana Nesterchuk</a></p>
-  </footer>
+    </footer>
+
 
 </body>
 </html>
