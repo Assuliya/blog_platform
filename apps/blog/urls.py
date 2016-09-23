@@ -4,6 +4,7 @@ urlpatterns = [
     url(r'^$', views.index, name='index'),
     url(r'^blog/main$', views.main, name='main'),
     url(r'^blog/display/(?P<search>\w+)$', views.display, name='display'),
+    url(r'^blog/search$', views.search, name='search'),
     url(r'^blog/(?P<user_id>\d+)$', views.user, name='user'),
     url(r'^blog/login$', views.login, name='login'),
     url(r'^blog/edit$', views.edit, name='edit'),

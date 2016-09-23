@@ -12,27 +12,25 @@
 <body>
   <div class="container bg-1">
     <h1 class="text-center">MY BLOG</h1>
-    <h2 class="text-center">Display Page</h2>
-    <br>
-    <form type="get" action="{% url 'search'%}" >
-      <select name="by" required>
-        <option placeholder>Search by...</option>
-        <option value="destination">Destination</option>
-        <option value="plan">Plan</option>
-        <option value="username">Username</option>
-      </select>
-      <input  class="black" type="text" name="search"  placeholder="Search..." >
-      <button type="submit" >Submit</button>
-    </form>
-    <br>
+    <h2 class="text-center">Search Page</h2>
     <br><br>
     <div class="row">
       <div class="col-sm-7">
         <div class="row">
           <div class="thumbnail shadow">
-            {% if result == 'latest' %}
-              <h2>Latest:</h2>
-              {%  for post in display %}
+            <form type="get" action="{% url 'search'%}" >
+              <select name="by" required>
+                <option placeholder>Search by...</option>
+                <option value="title">Post Title</option>
+                <option value="post">Post</option>
+                <option value="username">Username</option>
+              </select>
+              <input  class="black" type="text" name="search"  placeholder="Search..." >
+              <button type="submit" >Submit</button>
+            </form>
+            <br>
+            {% if result %}
+              {%  for post in result %}
                 <li><a href="{% url 'post' post_id=post.id %}"><div class="row">
                   <div class="col-sm-3">
                     {% if post.image.url != None %}
@@ -51,38 +49,6 @@
                       <p>{{post.post|slice:":100"}}...</p>
                     {% else %}
                       <p>{{post.post}}</p>
-                    {% endif %}
-                  </div>
-                  <div class="col-sm-2">
-                    {% if post.1 %}
-                      <p>Likes: {{post.1}}</p>
-                    {% else %}
-                      <p>Likes: 0</p>
-                    {% endif %}
-                  </div>
-                </div></a></li>
-              {% endfor %}
-            {% else %}
-              <h2>Most Liked:</h2>
-              {%  for post in display %}
-                <li><a href="{% url 'post' post_id=post.0.id %}"><div class="row">
-                  <div class="col-sm-3">
-                    {% if post.0.image.url != None %}
-                      <img src='{{post.0.image.url}}' class="img-responsive" style="width:100%" alt="post_picture">
-                    {% else %}
-                      <img src='/media/post/no.png' class="img-responsive" style="width:100%" alt="post_picture">
-                    {% endif %}
-                    <p class="green">{{post.0.user_id.username}}</p>
-                  </div>
-                  <div class="col-sm-3">
-                    <h4 class="green">{{post.0.title}}</h4>
-                    <p>{{post.0.created_at}}</p>
-                  </div>
-                  <div class="col-sm-4">
-                    {% if post.0.post|length > 100 %}
-                      <p>{{post.0.post|slice:":100"}}...</p>
-                    {% else %}
-                      <p>{{post.0.post}}</p>
                     {% endif %}
                   </div>
                   <div class="col-sm-2">
