@@ -94,3 +94,11 @@ label{
 .white{
   color: white !important;
 }
+
+table{
+  width: 100% !important;
+}
+
+table th{
+  text-align: center !important;
+}

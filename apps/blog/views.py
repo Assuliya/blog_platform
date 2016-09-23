@@ -13,7 +13,7 @@ def random_users(request):
     raw_users = User.objects.all().order_by(rnd_order)
     x = (random.choice(raw_users)).id
     if x > len(raw_users) - 3:
-        x -= 3
+        x -= 4
         if x < 0:
             x = 0
     users = raw_users[x:x+3]
@@ -98,9 +98,8 @@ def user(request, user_id):
 
 def edit(request):
     user = User.objects.get(id = request.session['user'])
-    random = random_users(request)
     context = {'user':user}
-    context.update(random)
+    context.update(random_users(request))
     if 'user' in request.session:
         context.update(user_liked(request))
     return render(request, 'blog/edit.html', context)
@@ -117,9 +116,8 @@ def main(request):
     def getKey(item):
         return item[1]
     liked = sorted(before_sort, key=getKey, reverse=True)
-    random = random_users(request)
     context = {'latest':latest, 'liked':liked, 'count':count}
-    context.update(random)
+    context.update(random_users(request))
     if 'user' in request.session:
         context.update(user_liked(request))
     return render(request, 'blog/main.html', context)
@@ -141,9 +139,8 @@ def display(request, search):
         display = sorted(before_sort, key=getKey, reverse=True)
     else:
         return redirect(reverse('main'))
-    random = random_users(request)
     context = {'display':display, 'count':count, 'result':result}
-    context.update(random)
+    context.update(random_users(request))
     if 'user' in request.session:
         context.update(user_liked(request))
     return render(request, 'blog/display.html', context)
@@ -159,9 +156,9 @@ def search(request):
             result = Post.objects.filter(post__contains = search_query)
         else:
             result = False
-        random = random_users(request)
-        context = {'result':result}
-        context.update(random)
+        count = Like.objects.all().values('post_id').annotate(count=Count('post_id')).order_by('-count')
+        context = {'result':result, 'count':count}
+        context.update(random_users(request))
         if 'user' in request.session:
             context.update(user_liked(request))
         return render(request, 'blog/search.html', context)
